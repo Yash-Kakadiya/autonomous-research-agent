@@ -6,7 +6,8 @@ pydantic
 python-dotenv
 
 langchain-community
-
+faiss-cpu
+pypdf
 langchainhub
 
 ddgs
