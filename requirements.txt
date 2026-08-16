@@ -1,0 +1,12 @@
+langchain
+langchain-google-genai
+streamlit
+duckduckgo-search
+pydantic
+python-dotenv
+
+langchain-community
+
+langchainhub
+
+ddgs
