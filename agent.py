@@ -1,8 +1,10 @@
 import os
+import datetime
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain_community.tools import DuckDuckGoSearchRun
+from langchain_core.tools import tool
 from langchain_classic.agents import create_tool_calling_agent, AgentExecutor
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_community.document_loaders import PyPDFLoader
@@ -44,14 +46,23 @@ def process_document(file_path: str):
     return retriever_tool
 
 
+@tool
+def safe_duckduckgo_search(query: str) -> str:
+    """Search the web for information. Use this to find current events, links, or facts."""
+    try:
+        search = DuckDuckGoSearchRun()
+        return search.invoke(query)
+    except Exception as e:
+        return f"Search failed due to a network error: {e}. Do not retry this search."
+
+
 # 3. Agent Setup with Memory
 def get_agent_executor(retriever_tool=None):
     llm = ChatGoogleGenerativeAI(
         model="gemini-3.5-flash", google_api_key=os.environ.get("GEMINI_API_KEY")
     )
 
-    search_tool = DuckDuckGoSearchRun()
-    tools = [search_tool]
+    tools = [safe_duckduckgo_search]
     if retriever_tool:
         tools.append(retriever_tool)
 
@@ -59,7 +70,7 @@ def get_agent_executor(retriever_tool=None):
         [
             (
                 "system",
-                "You are a highly capable AI research assistant. You have access to a web search tool and optionally a document search tool. Use them to answer questions accurately. If you don't know the answer, use your tools to find out.",
+                f"You are a highly capable AI research assistant. Today's date is {datetime.date.today()}. You have access to a web search tool and optionally a document search tool. Use them to answer questions accurately. IMPORTANT: Do NOT use any tools for casual conversation, greetings, or questions that you already know the answer to (e.g. asking for the date or basic facts). Only use tools when you need to research specific unknown information or search the user's document. NEVER call the same tool with similar queries more than twice. If you cannot find the answer after a few searches, stop and tell the user you couldn't find it.",
             ),
             MessagesPlaceholder(variable_name="chat_history"),
             ("human", "{input}"),
@@ -68,7 +79,13 @@ def get_agent_executor(retriever_tool=None):
     )
 
     agent = create_tool_calling_agent(llm, tools, prompt)
-    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+    agent_executor = AgentExecutor(
+        agent=agent,
+        tools=tools,
+        verbose=True,
+        max_iterations=5,
+        handle_parsing_errors=True,
+    )
     return agent_executor
 
 
@@ -76,7 +93,7 @@ def get_agent_executor(retriever_tool=None):
 def generate_structured_report(chat_history_text: str) -> ResearchReport:
     """Takes raw chat text and forces it into the Pydantic schema using LCEL."""
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.5-flash", google_api_key=os.environ.get("GEMINI_API_KEY")
+        model="gemini-3.5-flash", google_api_key=os.environ.get("GEMINI_API_KEY")
     )
 
     prompt = ChatPromptTemplate.from_messages(

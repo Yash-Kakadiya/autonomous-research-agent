@@ -11,3 +11,4 @@ pypdf
 langchainhub
 
 ddgs
+fpdf2
