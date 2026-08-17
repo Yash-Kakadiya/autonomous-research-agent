@@ -1,4 +1,4 @@
-# 🤖 Autonomous Research Assistant
+# 🤖 Autonomous Research Assistant 
 
 Welcome to the **Autonomous Research Assistant**! This is a beginner-friendly, fully open-source portfolio project demonstrating how to build a powerful AI agent using LangChain, Google's Gemini LLM, and Streamlit.
 
@@ -6,7 +6,7 @@ This app is designed to act as your personal researcher. You can ask it question
 
 ---
 
-## 🌟 What Can This App Do?
+## 🌟 What Can This App Do? | [🚀Live App](https://yash-research-agent.streamlit.app/)
 
 - **💬 Conversational Memory**: It remembers what you talked about earlier in the chat.
 - **🌐 Autonomous Web Search**: If you ask it a question about current events or facts it doesn't know, it will automatically use DuckDuckGo to search the web for the answer.
@@ -77,18 +77,6 @@ Your browser will automatically open a new tab with the app running!
 3. **Upload a PDF** in the sidebar. Once it processes, ask the agent a question about the PDF. The agent will automatically switch from searching the web to searching your document.
 4. **Generate a Report**: When you are satisfied with your research, click the **"Generate Final Report"** button in the sidebar.
 5. **Download**: On the report page, you can copy the raw Markdown, or click **"Create PDF"** to download a clean, formatted PDF copy of your research!
-
----
-
-## 🌍 Deployment (Hosting it on the Internet)
-
-Want to share your app with the world? The easiest way is using **HuggingFace Spaces** or **Streamlit Community Cloud**:
-
-1. Push your code to a public GitHub repository.
-2. Go to [Streamlit Community Cloud](https://share.streamlit.io/) or [HuggingFace Spaces](https://huggingface.co/spaces).
-3. Create a new app and connect it to your GitHub repository.
-4. In the hosting platform's settings, find the "Secrets" or "Environment Variables" section and add your `GEMINI_API_KEY`.
-5. Deploy! Your app will be live on a public URL.
 
 ---
 
