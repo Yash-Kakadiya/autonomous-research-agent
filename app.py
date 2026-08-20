@@ -1,4 +1,40 @@
 import streamlit as st
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import json
+from datetime import datetime, timezone
+
+@st.cache_resource
+def start_health_server():
+    class HealthCheckHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            if self.path == '/api/health':
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                response = {
+                    "status": "ok",
+                    "message": "Server is healthy",
+                    "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+            else:
+                self.send_response(404)
+                self.end_headers()
+                
+        def log_message(self, format, *args):
+            pass  # Suppress logs
+
+    def run_server():
+        server = HTTPServer(('0.0.0.0', 8000), HealthCheckHandler)
+        server.serve_forever()
+
+    thread = threading.Thread(target=run_server, daemon=True)
+    thread.start()
+    return thread
+
+start_health_server()
+
 import os
 import tempfile
 import ast
