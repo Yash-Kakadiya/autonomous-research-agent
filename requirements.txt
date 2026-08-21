@@ -4,8 +4,6 @@ streamlit
 duckduckgo-search
 pydantic
 python-dotenv
-uvicorn
-fastapi
 
 langchain-community
 faiss-cpu
